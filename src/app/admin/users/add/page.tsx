@@ -1,7 +1,9 @@
 "use client";
+
 import React, { useState } from "react";
 import api from "../../../utils/axios";
 import { useRouter } from "next/navigation";
+import { AxiosError } from "axios"; 
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
@@ -11,14 +13,19 @@ const AddUser = () => {
     role: "customer",
   });
 
-  const [errors, setErrors] = useState({ name: "", email: "", password: "" });
-  const [apiError, setApiError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ name: string; email: string; password: string }>({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const validate = () => {
+  const validate = (): boolean => {
     let valid = true;
-    let newErrors = { name: "", email: "", password: "" };
+    const newErrors = { name: "", email: "", password: "" };
 
     if (!formData.name.trim()) {
       newErrors.name = "Full name is required.";
@@ -43,12 +50,12 @@ const AddUser = () => {
     return valid;
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value || "" });
-    setErrors({ ...errors, [e.target.name]: "" });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
@@ -56,8 +63,12 @@ const AddUser = () => {
       setLoading(true);
       await api.post("/users/add", formData);
       router.push("/admin/users");
-    } catch (err) {
-      setApiError(err.response?.data?.message || "Failed to add user.");
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setApiError(err.response?.data?.message || "Failed to add user.");
+      } else {
+        setApiError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }

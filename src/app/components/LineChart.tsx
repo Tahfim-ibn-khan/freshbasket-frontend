@@ -1,11 +1,24 @@
 "use client";
+
 import React from "react";
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend);
+// Register required Chart.js components
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
-const LineChart = ({ salesData }) => {
+// Define type for each sales data entry
+interface SalesEntry {
+  date: string;
+  sales: number;
+}
+
+// Define props type
+interface LineChartProps {
+  salesData: SalesEntry[];
+}
+
+const LineChart: React.FC<LineChartProps> = ({ salesData }) => {
   const data = {
     labels: salesData.map((s) => s.date),
     datasets: [

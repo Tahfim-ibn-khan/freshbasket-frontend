@@ -15,19 +15,20 @@ const CreateProduct = () => {
     img_url: "",
   });
 
-  const [error, setError] = useState(""); 
-  const [isClient, setIsClient] = useState(false); 
+  const [error, setError] = useState<string>(""); 
+  const [isClient, setIsClient] = useState<boolean>(false); 
   const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value || "" });
   };
 
-  const handleSubmit = async (e) => {
+  // ✅ Fix: Explicitly define the event type for `handleSubmit`
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await api.post("/products/create", formData);

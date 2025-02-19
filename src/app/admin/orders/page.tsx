@@ -1,10 +1,25 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import api from "../../utils/axios";
 
+// ✅ Define a proper TypeScript interface for orders
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Order {
+  id: number;
+  totalPrice: number;
+  status: string;
+  user?: User; // Make user optional to avoid undefined errors
+}
+
 const AdminOrders = () => {
-  const [orders, setOrders] = useState([]);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]); // ✅ Fix: Explicitly define `Order[]`
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetchOrders();
@@ -18,7 +33,7 @@ const AdminOrders = () => {
         return;
       }
 
-      const res = await api.get("/order/all", {
+      const res = await api.get<Order[]>("/order/all", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -28,6 +43,8 @@ const AdminOrders = () => {
     } catch (err) {
       console.error("Error fetching orders:", err);
       setError("Failed to fetch orders. Please check the API.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +86,8 @@ const AdminOrders = () => {
       alert("Failed to generate invoice.");
     }
   };
+
+  if (loading) return <p className="text-center text-gray-600">Loading orders...</p>;
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">

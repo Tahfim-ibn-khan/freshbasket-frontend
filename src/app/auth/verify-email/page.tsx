@@ -1,5 +1,5 @@
 "use client"; // Ensure this is a Client Component
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../utils/axios";

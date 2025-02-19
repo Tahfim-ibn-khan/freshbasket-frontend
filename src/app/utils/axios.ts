@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const api = axios.create({
   baseURL: 'https://web-production-aec8.up.railway.app/', // ✅ Ensure this matches the backend URL
   headers: {

@@ -1,13 +1,24 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import api from "../../utils/axios";
 import Link from "next/link";
 
+interface Product {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  category_id: number;
+  quantity: number;
+  discount?: number;
+  img_url?: string;
+}
+
 const AdminProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true); 
-  
-  const [error, setError] = useState(null); 
+  const [products, setProducts] = useState<Product[]>([]); // ✅ Define Product Type
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -29,7 +40,7 @@ const AdminProducts = () => {
     if (!confirm("Are you sure you want to delete this product?")) return;
     try {
       await api.delete(`/products/delete/${id}`); 
-      setProducts(products.filter((product) => product.id !== id));
+      setProducts(products.filter((product) => product.id !== id)); // ✅ TypeScript now recognizes `id`
       alert("Product deleted successfully.");
     } catch (err) {
       console.error("Failed to delete product:", err);
@@ -39,8 +50,6 @@ const AdminProducts = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-
-
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Manage Products</h2>
 
       <div className="flex justify-center mb-6">
@@ -53,7 +62,6 @@ const AdminProducts = () => {
       </div>
 
       {loading && <p className="text-center text-gray-600">Loading products...</p>}
-
       {error && <p className="text-center text-red-500">{error}</p>}
 
       {!loading && !error && (
@@ -61,7 +69,7 @@ const AdminProducts = () => {
           {products.length > 0 ? (
             products.map((product) => (
               <div
-                key={product.id}
+                key={product.id} // ✅ TypeScript recognizes `id`
                 className="bg-white p-4 shadow-md rounded-lg transition duration-300 hover:shadow-xl"
               >
                 <img

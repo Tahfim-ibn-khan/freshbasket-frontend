@@ -1,11 +1,20 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import api from "../../utils/axios";
 import Link from "next/link";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  profilePicture?: string;
+}
+
 const AdminUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -13,21 +22,19 @@ const AdminUsers = () => {
     if (storedUser?.email) {
       setLoggedInUserEmail(storedUser.email);
     }
-  }, []); // ✅ Ensure the email is set **before** fetching users
+  }, []);
 
   useEffect(() => {
     if (loggedInUserEmail) {
       fetchUsers();
     }
-  }, [loggedInUserEmail]); // ✅ Fetch users only after email is set
+  }, [loggedInUserEmail]);
 
   const fetchUsers = async () => {
     try {
       const res = await api.get("/users/getall");
-      
-      // ✅ Ensure email is set before filtering
       if (loggedInUserEmail) {
-        const filteredUsers = res.data.filter((user: any) => user.email !== loggedInUserEmail);
+        const filteredUsers = res.data.filter((user: User) => user.email !== loggedInUserEmail);
         setUsers(filteredUsers);
       }
     } catch (err) {
@@ -36,9 +43,7 @@ const AdminUsers = () => {
   };
 
   const handleUpdateRole = async (id: number) => {
-    const newRole = prompt(
-      "Enter new role (admin, customer, delivery-agent, store-manager):"
-    );
+    const newRole = prompt("Enter new role (admin, customer, delivery-agent, store-manager):");
     if (!newRole) return;
 
     try {
@@ -52,9 +57,7 @@ const AdminUsers = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
-        User Management
-      </h2>
+      <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">User Management</h2>
 
       <div className="flex justify-center mb-6">
         <Link
@@ -93,9 +96,7 @@ const AdminUsers = () => {
               />
             </div>
 
-            <h3 className="text-lg font-semibold text-center text-gray-900 mt-3">
-              {user.name}
-            </h3>
+            <h3 className="text-lg font-semibold text-center text-gray-900 mt-3">{user.name}</h3>
             <p className="text-gray-600 text-center">{user.email}</p>
             <p className="text-blue-600 font-semibold text-center mt-1 bg-blue-100 px-3 py-1 rounded-lg inline-block">
               {user.role.charAt(0).toUpperCase() + user.role.slice(1)}

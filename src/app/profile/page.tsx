@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import api from "../utils/axios";
@@ -6,7 +7,7 @@ import api from "../utils/axios";
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,12 +21,7 @@ const Profile = () => {
         const res = await api.get(`/users/profile/${storedUser.id}`);
         setUser(res.data);
 
-        // ✅ Ensure valid profile image or set default placeholder
-        if (res.data.profilePicture) {
-          setProfileImage(res.data.profilePicture);
-        } else {
-          setProfileImage("https://via.placeholder.com/150");
-        }
+        setProfileImage(res.data.profilePicture || "https://via.placeholder.com/150");
       } catch (error) {
         console.error("Error fetching user profile:", error);
       } finally {
@@ -36,18 +32,11 @@ const Profile = () => {
     fetchUserProfile();
   }, []);
 
-  if (loading)
-    return (
-      <p className="text-center text-gray-600 text-lg mt-10">
-        Loading profile...
-      </p>
-    );
+  if (loading) return <p className="text-center text-gray-600 text-lg mt-10">Loading profile...</p>;
 
   return (
     <div className="container mx-auto p-6 max-w-md">
-      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-        User Profile
-      </h2>
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">User Profile</h2>
 
       {user ? (
         <div className="border p-6 rounded-lg shadow-lg bg-white text-center">
@@ -63,9 +52,7 @@ const Profile = () => {
             />
           </div>
 
-          <h3 className="text-2xl font-semibold text-gray-900 mt-4">
-            {user.name}
-          </h3>
+          <h3 className="text-2xl font-semibold text-gray-900 mt-4">{user.name}</h3>
           <p className="text-gray-600 text-lg">{user.email}</p>
 
           <button
