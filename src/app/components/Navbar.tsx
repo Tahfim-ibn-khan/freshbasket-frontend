@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import api from "../utils/axios";
@@ -8,6 +8,9 @@ const Navbar = () => {
   const [user, setUser] = useState<any>(null);
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -62,6 +65,21 @@ const Navbar = () => {
     router.push("/auth/login");
   };
 
+  const handleOutsideClick = (e: MouseEvent) => {
+    if (
+      menuRef.current && !menuRef.current.contains(e.target as Node) &&
+      dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
+    ) {
+      setMenuOpen(false);
+      setDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
   return (
     <nav className="bg-gray-900 shadow-md px-4 lg:px-8">
       <div className="flex justify-between items-center py-4">
@@ -72,44 +90,6 @@ const Navbar = () => {
         >
           <span className="text-green-400">Fresh</span>Basket
         </Link>
-
-        {/* Hamburger Icon */}
-        <button
-          className="lg:hidden text-white focus:outline-none"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              fill="none"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              fill="none"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          )}
-        </button>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex space-x-6">
@@ -164,18 +144,36 @@ const Navbar = () => {
           )}
 
           {user ? (
-            <div className="relative group">
-              <button className="text-white focus:outline-none">
-                {user.name}
+            <div ref={dropdownRef} className="relative">
+              <button onClick={() => setDropdownOpen(!dropdownOpen)} className="focus:outline-none">
+                <img
+                  src={
+                    user.profilePicture
+                      ? user.profilePicture
+                      : "https://res.cloudinary.com/dquhmyg3y/image/upload/v1700000000/default-profile.png"
+                  }
+                  alt="User Avatar"
+                  className="h-10 w-10 rounded-full border-2 border-gray-500"
+                />
               </button>
-              <div className="absolute hidden group-hover:block bg-gray-800 rounded-md shadow-md mt-2">
-                <Link href="/profile" className="block px-4 py-2 text-white hover:bg-gray-700">
-                  Profile
-                </Link>
-                <button onClick={handleLogout} className="block w-full px-4 py-2 text-white hover:bg-gray-700 text-left">
-                  Logout
-                </button>
-              </div>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-md z-10">
+                  <Link href="/profile" className="block px-4 py-2 text-white hover:bg-gray-700">
+                    Profile
+                  </Link>
+                  {user.role === "customer" && (
+                    <Link href="/orders" className="block px-4 py-2 text-white hover:bg-gray-700">
+                      Order History
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full px-4 py-2 text-white hover:bg-gray-700 text-left"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             !pathname.startsWith("/auth") && (
@@ -189,37 +187,22 @@ const Navbar = () => {
               </div>
             )
           )}
+
+          {/* Hamburger Menu */}
+          <button
+            className="lg:hidden text-white focus:outline-none"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="lg:hidden flex flex-col bg-gray-900 space-y-2 p-4">
-          {user?.role === "admin" ? (
-            <>
-              <Link href="/admin/dashboard" className="text-white">
-                Dashboard
-              </Link>
-              <Link href="/admin/products" className="text-white">
-                All Products
-              </Link>
-              <Link href="/admin/products/create" className="text-white">
-                New Product
-              </Link>
-              <Link href="/admin/orders" className="text-white">
-                Orders
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link href="/" className="text-white">
-                Home
-              </Link>
-              <Link href="/products" className="text-white">
-                Products
-              </Link>
-            </>
-          )}
+        <div ref={menuRef} className="lg:hidden flex flex-col bg-gray-900 space-y-2 p-4">
+          <Link href="/" className="text-white">Home</Link>
+          <Link href="/products" className="text-white">Products</Link>
         </div>
       )}
     </nav>

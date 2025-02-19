@@ -66,11 +66,11 @@ const ProductCard = ({ product }: { product: any }) => {
       </div>
 
       <div className="p-4">
-        <Link href={`/products/${product.id}`}>
+        <span>
           <h2 className="mb-2 text-lg font-semibold dark:text-white text-gray-900 hover:text-green-600 transition-colors duration-200 cursor-pointer">
             {product.title || "Unnamed Product"}
           </h2>
-        </Link>
+        </span>
 
         <p className="mb-2 text-sm dark:text-gray-300 text-gray-700">
           {product.description?.length > 100

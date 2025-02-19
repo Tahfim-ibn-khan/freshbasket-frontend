@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import api from "../utils/axios";
 import { useRouter } from "next/navigation";
 
-// Define types for products and orders
 interface Product {
   productId: number;
   productName: string;
@@ -70,17 +69,18 @@ const OrderHistory: React.FC = () => {
     );
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h2 className="text-3xl font-bold text-green-700 text-center mb-6">Your Order History</h2>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
+      <h2 className="text-2xl sm:text-3xl font-bold text-green-700 text-center mb-6">Your Order History</h2>
 
       {orders.length === 0 ? (
         <p className="text-gray-500 text-center">No past orders found.</p>
       ) : (
         <div className="space-y-6">
           {orders.map((order) => (
-            <div key={order.id} className="border p-6 rounded-lg shadow-lg bg-white">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-semibold text-gray-800">Order #{order.id}</h3>
+            <div key={order.id} className="border p-4 sm:p-6 rounded-lg shadow-lg bg-white">
+              {/* Order Header */}
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">Order #{order.id}</h3>
                 <span
                   className={`px-3 py-1 text-sm font-semibold rounded-lg ${
                     order.status === "paid"
@@ -92,45 +92,35 @@ const OrderHistory: React.FC = () => {
                 </span>
               </div>
 
-              <div className="text-gray-700 space-y-1">
-                <p>
-                  <strong>Order Date:</strong>{" "}
-                  {new Date(order.orderDate).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Payment Method:</strong> {order.paymentMethod}
-                </p>
-                <p>
-                  <strong>Delivery Address:</strong> {order.deliveryAddress}
-                </p>
-                <p>
-                  <strong>Phone Number:</strong> {order.phoneNumber}
-                </p>
-                <p>
-                  <strong>Delivery Instructions:</strong>{" "}
-                  {order.deliveryInstructions || "None"}
-                </p>
+              {/* Order Details */}
+              <div className="text-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
+                <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
+                <p><strong>Delivery Address:</strong> {order.deliveryAddress}</p>
+                <p><strong>Phone Number:</strong> {order.phoneNumber}</p>
+                <p className="sm:col-span-2"><strong>Delivery Instructions:</strong> {order.deliveryInstructions || "None"}</p>
               </div>
 
+              {/* Ordered Products */}
               <div className="mt-4">
-                <h4 className="text-lg font-semibold text-gray-800">Ordered Products</h4>
+                <h4 className="text-lg font-semibold text-gray-800 mb-2">Ordered Products</h4>
                 <div className="overflow-x-auto">
-                  <table className="w-full table-auto border-collapse mt-2 shadow-sm">
+                  <table className="w-full border-collapse mt-2 shadow-sm text-sm sm:text-base">
                     <thead>
-                      <tr className="bg-gray-100 text-gray-700">
-                        <th className="p-3 text-left">Product</th>
-                        <th className="p-3 text-center">Qty</th>
-                        <th className="p-3 text-right">Unit Price</th>
-                        <th className="p-3 text-right">Total</th>
+                      <tr className="bg-gray-100 text-gray-700 text-left">
+                        <th className="p-2 sm:p-3">Product</th>
+                        <th className="p-2 sm:p-3 text-center">Qty</th>
+                        <th className="p-2 sm:p-3 text-right">Unit Price</th>
+                        <th className="p-2 sm:p-3 text-right">Total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {order.products.map((product: Product) => (
                         <tr key={product.productId} className="border-b hover:bg-gray-50">
-                          <td className="p-3">{product.productName}</td>
-                          <td className="p-3 text-center">{product.quantity}</td>
-                          <td className="p-3 text-right">Tk. {product.unitPrice}</td>
-                          <td className="p-3 text-right font-semibold text-green-600">
+                          <td className="p-2 sm:p-3">{product.productName}</td>
+                          <td className="p-2 sm:p-3 text-center">{product.quantity}</td>
+                          <td className="p-2 sm:p-3 text-right">Tk. {product.unitPrice}</td>
+                          <td className="p-2 sm:p-3 text-right font-semibold text-green-600">
                             Tk. {product.total.toFixed(2)}
                           </td>
                         </tr>
@@ -140,8 +130,9 @@ const OrderHistory: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mt-4">
-                <h3 className="text-xl font-bold text-gray-900">
+              {/* Order Total */}
+              <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                   Total: <span className="text-green-600">Tk. {order.totalPrice}</span>
                 </h3>
               </div>

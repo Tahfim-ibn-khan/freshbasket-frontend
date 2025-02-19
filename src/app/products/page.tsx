@@ -13,8 +13,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // ✅ Prevent SSR hydration issues
-
+    if (typeof window === "undefined") return; 
     const fetchProducts = async () => {
       try {
         const res = await api.get("/products/getall") || {};
